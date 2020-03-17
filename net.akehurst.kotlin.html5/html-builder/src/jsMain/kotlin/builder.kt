@@ -25,7 +25,7 @@ fun Element.update(modifications: HtmlElementBuilder.() -> Unit = {}) {
 }
 fun Element.create() = HtmlElementBuilder(this)
 fun SVGElement.create() = SvgElementBuilder(this)
-fun SVGElement.update(modifications: SvgElementBuilder.() -> Unit = {}) {
+fun SVGElement.svgUpdate(modifications: SvgElementBuilder.() -> Unit = {}) {
     val b = SvgElementBuilder(this)
     b.modifications()
 }
