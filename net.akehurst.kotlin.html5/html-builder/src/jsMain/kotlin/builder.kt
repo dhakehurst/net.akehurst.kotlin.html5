@@ -23,23 +23,25 @@ fun Element.update(modifications: HtmlElementBuilder.() -> Unit = {}) {
     val b = HtmlElementBuilder(this)
     b.modifications()
 }
+
 fun Element.create() = HtmlElementBuilder(this)
 fun SVGElement.create() = SvgElementBuilder(this)
 fun SVGElement.svgUpdate(modifications: SvgElementBuilder.() -> Unit = {}) {
     val b = SvgElementBuilder(this)
     b.modifications()
 }
+
 class HtmlElementBuilder(val parent: Element) {
 
     val attribute = AttributeBuilder(parent)
     val class_ = ClassBuilder(parent)
     val style = StyleBuilder(parent)
 
-    var content :String?
-    get() = this.parent.textContent
-    set(value) {
-        this.parent.textContent = value
-    }
+    var content: String?
+        get() = this.parent.textContent
+        set(value) {
+            this.parent.textContent = value
+        }
 
     fun htmlElement(tagName: String, init: HtmlElementBuilder.() -> Unit = {}): Element {
         val child = parent.ownerDocument!!.createElement(tagName)
@@ -48,9 +50,32 @@ class HtmlElementBuilder(val parent: Element) {
         return child
     }
 
-    fun main(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("main", init)
+    private fun customElement(tagName: String, init: HtmlElementBuilder.() -> Unit = {},customBuild: HtmlElementBuilder.() -> Unit = {}): Element {
+        val child = parent.ownerDocument!!.createElement(tagName)
+        parent.appendChild(child)
+        val b = HtmlElementBuilder(child)
+        b.customBuild()
+        b.init()
+        return child
+    }
+
+    fun article(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("article", init)
     fun div(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("div", init)
+    fun footer(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("footer", init)
+    fun header(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("header", init)
+    fun h1(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h1", init)
+    fun h2(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h2", init)
+    fun h3(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h3", init)
+    fun input(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("input", init)
+    fun label(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("label", init)
+    fun main(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("main", init)
+    fun section(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("section", init)
+    fun select(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("select", init)
     fun span(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("span", init)
+
+    fun radio(init: HtmlElementBuilder.() -> Unit = {}) = customElement("input", init) {
+        attribute.type = "radio"
+    }
 
     fun svg(init: SvgElementBuilder.() -> Unit = {}): SVGElement {
         val child = parent.ownerDocument!!.createElementNS("http://www.w3.org/2000/svg", "svg") as SVGElement
@@ -75,11 +100,15 @@ class AttributeBuilder(
         }
     }
 
+    var checked get() = get("checked"); set(value) = set("checked", value)
     var class_ get() = get("class"); set(value) = set("class", value)
     var contenteditable get() = get("contenteditable"); set(value) = set("contenteditable", value)
     var height get() = get("height"); set(value) = set("height", value)
     var id get() = get("id"); set(value) = set("id", value)
+    var for_ get() = get("for"); set(value) = set("for", value)
     var style get() = get("style"); set(value) = set("style", value)
+    var type get() = get("type"); set(value) = set("type", value)
+    var value get() = get("value"); set(value) = set("value", value)
     var width get() = get("width"); set(value) = set("width", value)
 }
 
@@ -174,6 +203,8 @@ class SvgElementBuilder(
         val parent: SVGElement
 ) {
     val attribute = SVGAttributeBuilder(parent)
+    val class_ = ClassBuilder(parent)
+    val style = StyleBuilder(parent)
 
     fun svgElement(tagName: String, init: SvgElementBuilder.() -> Unit = {}): SVGElement {
         val child = parent.ownerDocument!!.createElementNS("http://www.w3.org/2000/svg", tagName) as SVGElement
@@ -188,6 +219,7 @@ class SvgElementBuilder(
     fun g(init: SvgElementBuilder.() -> Unit = {}) = svgElement("g", init)
     fun circle(init: SvgElementBuilder.() -> Unit = {}) = svgElement("circle", init)
     fun rect(init: SvgElementBuilder.() -> Unit = {}) = svgElement("rect", init)
+    fun line(init: SvgElementBuilder.() -> Unit = {}) = svgElement("line", init)
 }
 
 class SVGAttributeBuilder(
@@ -212,6 +244,7 @@ class SVGAttributeBuilder(
     var fill get() = get("fill"); set(value) = set("fill", value)
     var id get() = get("id"); set(value) = set("id", value)
     var height get() = get("height"); set(value) = set("height", value)
+    var marker_end get() = get("marker-end"); set(value) = set("marker-end", value)
     var markerHeight get() = get("markerHeight"); set(value) = set("markerHeight", value)
     var markerUnits get() = get("markerUnits"); set(value) = set("markerUnits", value)
     var markerWidth get() = get("markerWidth"); set(value) = set("markerWidth", value)
@@ -226,5 +259,9 @@ class SVGAttributeBuilder(
     var viewBox get() = get("viewBox"); set(value) = set("viewBox", value)
     var width get() = get("width"); set(value) = set("width", value)
     var x get() = get("x"); set(value) = set("x", value)
+    var x1 get() = get("x1"); set(value) = set("x1", value)
+    var x2 get() = get("x2"); set(value) = set("x2", value)
     var y get() = get("y"); set(value) = set("y", value)
+    var y1 get() = get("y1"); set(value) = set("y1", value)
+    var y2 get() = get("y2"); set(value) = set("y2", value)
 }
