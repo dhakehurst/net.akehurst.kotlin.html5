@@ -4,7 +4,6 @@ import org.w3c.dom.Element
 import org.w3c.dom.svg.SVGElement
 import org.w3c.dom.Document
 import org.w3c.dom.events.Event
-import kotlin.dom.appendText
 
 fun Document.head(init: HtmlElementBuilder.() -> Unit = {}): Element {
     val child = this.createElement("head")
