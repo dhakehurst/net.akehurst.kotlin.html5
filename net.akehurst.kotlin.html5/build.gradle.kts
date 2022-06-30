@@ -18,9 +18,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
 
 plugins {
-    //kotlin("multiplatform") version("1.5.20-RC-179") apply false
-    kotlin("multiplatform") version("1.5.10") apply false
-    id("com.github.gmazzo.buildconfig") version("3.0.0") apply false
+    kotlin("multiplatform") version("1.7.0") apply false
+    id("com.github.gmazzo.buildconfig") version("3.1.0") apply false
 }
 
 allprojects {
@@ -46,9 +45,9 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
-        }
+        //maven {
+        //    url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+        //}
     }
 
     configure<BuildConfigExtension> {
@@ -68,20 +67,20 @@ subprojects {
         jvm("jvm8") {
             val main by compilations.getting {
                 kotlinOptions {
-                    languageVersion = "1.5"
-                    apiVersion = "1.5"
+                    //languageVersion = "1.5"
+                    //apiVersion = "1.5"
                     jvmTarget = JavaVersion.VERSION_1_8.toString()
                 }
             }
             val test by compilations.getting {
                 kotlinOptions {
-                    languageVersion = "1.5"
-                    apiVersion = "1.5"
+                    //languageVersion = "1.5"
+                    //apiVersion = "1.5"
                     jvmTarget = JavaVersion.VERSION_1_8.toString()
                 }
             }
         }
-        js("js") {
+        js("js",IR) {
             nodejs()
             browser {
                 webpackTask {
@@ -104,9 +103,9 @@ subprojects {
         "commonTestImplementation"(kotlin("test"))
         "commonTestImplementation"(kotlin("test-annotations-common"))
 
-        "jvm8TestImplementation"(kotlin("test-junit"))
+        //"jvm8TestImplementation"(kotlin("test-junit"))
 
-        "jsTestImplementation"(kotlin("test-js"))
+        //"jsTestImplementation"(kotlin("test-js"))
     }
 
 }

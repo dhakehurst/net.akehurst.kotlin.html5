@@ -13,15 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-pluginManagement {
-    repositories {
-        mavenLocal()
-        gradlePluginPortal()
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
-        }
-    }
-}
+
 rootProject.name = file(".").name
 
 fileTree(".") {
