@@ -61,8 +61,12 @@ class HtmlElementBuilder(val element: Element) {
     }
 
     fun a(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("a", init)
+    fun address(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("address", init)
     fun article(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("article", init)
+    fun aside(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("aside", init)
     fun button(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("button", init)
+    fun canvas(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("canvas", init)
+    fun code(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("code", init)
     fun dialog(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("dialog", init)
     fun div(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("div", init)
     fun footer(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("footer", init)
@@ -70,18 +74,33 @@ class HtmlElementBuilder(val element: Element) {
     fun h1(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h1", init)
     fun h2(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h2", init)
     fun h3(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h3", init)
+    fun img(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("img", init)
     fun input(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("input", init)
     fun label(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("label", init)
+    fun li(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("li", init)
+    fun ol(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("ol", init)
+    fun optgroup(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("optgroup", init)
+    fun option(disabled:Boolean=false, label:String="", selected:Boolean=false, value:String="", init: HtmlElementBuilder.() -> Unit = {}): Element {
+        return htmlElement("option", init).also {
+            if (disabled) it.setAttribute("disabled","true")
+            if (label.isNotBlank()) it.setAttribute("label", label)
+            if (selected) it.setAttribute("selected","true")
+            if (value.isNotBlank()) it.setAttribute("value", value)
+        }
+    }
     fun p(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("p", init)
+    fun progress(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("progress", init)
     fun main(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("main", init)
     fun nav(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("nav", init)
-    fun section(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("section", init)
-    fun select(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("select", init)
-    fun span(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("span", init)
-
     fun radio(init: HtmlElementBuilder.() -> Unit = {}) = customElement("input", init) {
         attribute.type = "radio"
     }
+    fun section(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("section", init)
+    fun select(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("select", init)
+    fun span(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("span", init)
+    fun table(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("table", init)
+    fun textarea(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("textarea", init)
+    fun ul(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("ul", init)
 
     fun svg(init: SvgElementBuilder.() -> Unit = {}): SVGElement {
         val child = element.ownerDocument!!.createElementNS("http://www.w3.org/2000/svg", "svg") as SVGElement

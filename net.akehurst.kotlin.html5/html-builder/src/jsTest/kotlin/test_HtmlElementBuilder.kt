@@ -1,7 +1,6 @@
 package net.akehurst.kotlin.html5
 
-import kotlin.browser.document
-import kotlin.test.Test
+import kotlinx.browser.document
 
 
 class test_HtmlElementBuilder {

@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import com.github.gmazzo.gradle.plugins.BuildConfigExtension
+import org.gradle.internal.jvm.Jvm
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 plugins {
-    kotlin("multiplatform") version("1.7.0") apply false
+    kotlin("multiplatform") version("1.9.0-RC") apply false
+    id("org.jetbrains.dokka") version ("1.8.20") apply false
     id("com.github.gmazzo.buildconfig") version("3.1.0") apply false
+    id("nu.studer.credentials") version ("3.0")
+    id("net.akehurst.kotlin.gradle.plugin.exportPublic") version("1.9.0-RC") apply false
 }
+val kotlin_languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+val kotlin_apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_1_9
+val jvmTargetVersion = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
 
 allprojects {
 
     val version_project: String by project
-    val group_project = "${rootProject.name}"
+    val group_project = rootProject.name
 
     group = group_project
     version = version_project
@@ -38,16 +47,20 @@ fun getProjectProperty(s: String) = project.findProperty(s) as String?
 
 subprojects {
 
-    apply(plugin="org.jetbrains.kotlin.multiplatform")
+    apply(plugin = "org.jetbrains.kotlin.multiplatform")
     apply(plugin = "maven-publish")
+    apply(plugin = "signing")
+    apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "com.github.gmazzo.buildconfig")
+    apply(plugin = "net.akehurst.kotlin.gradle.plugin.exportPublic")
 
     repositories {
-        mavenLocal()
+        mavenLocal {
+            content{
+                includeGroupByRegex("net\\.akehurst.+")
+            }
+        }
         mavenCentral()
-        //maven {
-        //    url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
-        //}
     }
 
     configure<BuildConfigExtension> {
@@ -65,22 +78,32 @@ subprojects {
 
     configure<KotlinMultiplatformExtension> {
         jvm("jvm8") {
-            val main by compilations.getting {
-                kotlinOptions {
-                    //languageVersion = "1.5"
-                    //apiVersion = "1.5"
-                    jvmTarget = JavaVersion.VERSION_1_8.toString()
+            compilations {
+                val main by getting {
+                    compilerOptions.configure {
+                        languageVersion.set(kotlin_languageVersion)
+                        apiVersion.set(kotlin_apiVersion)
+                        jvmTarget.set(jvmTargetVersion)
+                    }
                 }
-            }
-            val test by compilations.getting {
-                kotlinOptions {
-                    //languageVersion = "1.5"
-                    //apiVersion = "1.5"
-                    jvmTarget = JavaVersion.VERSION_1_8.toString()
+                val test by getting {
+                    compilerOptions.configure {
+                        languageVersion.set(kotlin_languageVersion)
+                        apiVersion.set(kotlin_apiVersion)
+                        jvmTarget.set(jvmTargetVersion)
+                    }
                 }
             }
         }
         js("js",IR) {
+            binaries.library()
+            generateTypeScriptDefinitions()
+            tasks.withType<KotlinJsCompile>().configureEach {
+                kotlinOptions {
+                    moduleKind = "es"
+                    useEsClasses = true
+                }
+            }
             nodejs()
             browser {
                 webpackTask {
@@ -98,14 +121,18 @@ subprojects {
         }
     }
 
-
     dependencies {
         "commonTestImplementation"(kotlin("test"))
         "commonTestImplementation"(kotlin("test-annotations-common"))
-
-        //"jvm8TestImplementation"(kotlin("test-junit"))
-
-        //"jsTestImplementation"(kotlin("test-js"))
     }
 
+    configure<SigningExtension> {
+        useGpgCmd()
+        val publishing = project.properties["publishing"] as PublishingExtension
+        sign(publishing.publications)
+    }
+
+    rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
+        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().version = "1.22.19"
+    }
 }

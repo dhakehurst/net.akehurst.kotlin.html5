@@ -13,6 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+pluginManagement {
+    repositories {
+        mavenLocal {
+            content{
+                includeGroupByRegex("net\\.akehurst.+")
+            }
+        }
+        gradlePluginPortal()
+    }
+}
 
 rootProject.name = file(".").name
 
