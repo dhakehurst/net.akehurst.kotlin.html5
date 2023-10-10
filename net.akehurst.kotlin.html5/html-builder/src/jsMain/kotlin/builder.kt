@@ -66,6 +66,9 @@ class HtmlElementBuilder(val element: Element) {
     fun aside(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("aside", init)
     fun button(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("button", init)
     fun canvas(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("canvas", init)
+    fun checkbox(init: HtmlElementBuilder.() -> Unit = {}) = customElement("input", init) {
+        attribute.type = "checkbox"
+    }
     fun code(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("code", init)
     fun dialog(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("dialog", init)
     fun div(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("div", init)
