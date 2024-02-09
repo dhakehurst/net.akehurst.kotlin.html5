@@ -1,5 +1,8 @@
 package net.akehurst.kotlin.html5
 
+import net.akehurst.language.editor.technology.gui.widgets.TabView
+import net.akehurst.language.editor.technology.gui.widgets.TreeView
+import net.akehurst.language.editor.technology.gui.widgets.TreeViewFunctions
 import org.w3c.dom.Element
 import org.w3c.dom.svg.SVGElement
 import org.w3c.dom.Document
@@ -77,6 +80,7 @@ class HtmlElementBuilder(val element: Element) {
     fun h1(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h1", init)
     fun h2(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h2", init)
     fun h3(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("h3", init)
+    fun icon(class_:String) = htmlElement("i", { attribute.class_=class_ })
     fun img(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("img", init)
     fun input(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("input", init)
     fun label(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("label", init)
@@ -102,6 +106,17 @@ class HtmlElementBuilder(val element: Element) {
     fun select(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("select", init)
     fun span(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("span", init)
     fun table(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("table", init)
+
+    fun tabview(init: HtmlElementBuilder.() -> Unit = {}) :TabView {
+        val element =htmlElement("tabview", init)
+        return TabView(element)
+    }
+    fun <T:Any> treeview(id:String, treeFunctions: TreeViewFunctions<T>) :TreeView<T> {
+        val element = htmlElement("treeview", {attribute.id=id})
+        val tv = TreeView<T>(element)
+        tv.treeFunctions = treeFunctions
+        return tv
+    }
     fun textarea(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("textarea", init)
     fun ul(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("ul", init)
 
