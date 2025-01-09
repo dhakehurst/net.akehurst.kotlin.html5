@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package net.akehurst.language.editor.technology.gui.widgets
+package net.akehurst.kotlin.html5.widgets
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
 import org.w3c.dom.events.Event
 
@@ -42,6 +43,7 @@ class TabView(
         var firstTab:Element? = null
         element.querySelectorAll(":scope > tab").asList().filterIsInstance<Element>().forEach { tab ->
             val header = document.createElement("tab-header")
+            header.id = tab.getAttribute("id")!!
             nav.appendChild(header)
             header.textContent = tab.getAttribute("id")
             header.addEventListener("click", { _ ->
@@ -57,7 +59,15 @@ class TabView(
         }
     }
 
-    fun tabSelect(header: Element, tab: Element) {
+    fun activateTab(id:String) {
+        val header = this.element.querySelector("tab-header#$id") as HTMLElement?
+        val tab = this.element.querySelector("tab#$id") as HTMLElement?
+        if (null!=header && null != tab) {
+            tabSelect(header, tab)
+        }
+    }
+
+    private fun tabSelect(header: Element, tab: Element) {
         this.element.querySelectorAll(":scope > tab-nav > tab-header").asList().filterIsInstance<Element>().forEach { e ->
             e.classList.remove("tab-active")
         }

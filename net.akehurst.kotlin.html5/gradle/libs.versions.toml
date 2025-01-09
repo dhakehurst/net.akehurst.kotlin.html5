@@ -1,0 +1,20 @@
+[versions]
+project = "2.1.0"
+
+kotlin = "2.1.0"
+dokka = "1.9.20"
+exportPublic = "2.1.0"
+buildconfig = "5.5.0"
+credentials = "3.0"
+
+kotlinx-coroutines = "1.9.0"
+
+[libraries]
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+exportPublic =  { id = "net.akehurst.kotlin.gradle.plugin.exportPublic", version.ref = "exportPublic" }
+buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+credentials = { id = "nu.studer.credentials", version.ref = "credentials" }
