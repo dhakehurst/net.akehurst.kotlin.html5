@@ -31,20 +31,31 @@ annotation class HtmlDslMarker
 fun Document.head(init: HtmlElementBuilder.() -> Unit = {}): Element {
     val child = this.createElement("head")
     this.appendChild(child)
-    HtmlElementBuilder(child).init()
+    val b = HtmlElementBuilder(child)
+    b.init()
+    b.append()
     return child
 }
 
 fun Document.body(init: HtmlElementBuilder.() -> Unit = {}): Element {
     val child = this.createElement("body")
     this.appendChild(child)
-    HtmlElementBuilder(child).init()
+    val b = HtmlElementBuilder(child)
+    b.init()
+    b.append()
     return child
 }
 
-fun Element.elUpdate(modifications: HtmlElementBuilder.() -> Unit = {}) {
+fun Element.elAppend(init: HtmlElementBuilder.() -> Unit = {}) {
     val b = HtmlElementBuilder(this)
-    b.modifications()
+    b.init()
+    b.append()
+}
+
+fun Element.elInsert(init: HtmlElementBuilder.() -> Unit = {}) {
+    val b = HtmlElementBuilder(this)
+    b.init()
+    b.insert()
 }
 
 fun Element.elCreate() = HtmlElementBuilder(this)
@@ -56,32 +67,54 @@ fun SVGElement.svgUpdate(modifications: SvgElementBuilder.() -> Unit = {}) {
 }
 
 @HtmlDslMarker
-class HtmlElementBuilder(val element: Element) {
+class HtmlElementBuilder(
+    private val _element: Element
+) {
 
-    val attribute = AttributeBuilder(element)
-    val on = EventHandlerBuilder(element)
-    val class_ = ClassBuilder(element)
-    val style = StyleBuilder(element)
+    private val _container = document.createElement("template") //container to hold the new content
+
+    val attribute = AttributeBuilder(_element)
+    val on = EventHandlerBuilder(_element)
+    val class_ = ClassBuilder(_element)
+    val style = StyleBuilder(_element)
 
     var content: String?
-        get() = this.element.textContent
+        get() = this._container.textContent
         set(value) {
-            this.element.textContent = value
+            this._container.textContent = value
         }
 
+    internal fun append() {
+        val list = _container.childNodes.asList().toMutableList()
+        list.forEach {
+            val ch = _container.removeChild(it)
+            _element.appendChild(ch)
+        }
+    }
+
+    internal fun insert() {
+        _container.childNodes.asList().reversed().forEach {
+            val ch = _container.removeChild(it) as Element
+            val fc = _element.firstChild
+            _element.appendChild(ch)
+            fc?.let { _element.insertBefore(fc, ch) }
+        }
+    }
+
     fun htmlElement(tagName: String, init: HtmlElementBuilder.() -> Unit = {}): HTMLElement {
-        val child = element.ownerDocument!!.createElement(tagName)
-        element.appendChild(child)
-        HtmlElementBuilder(child).init()
+        val child = _container.ownerDocument!!.createElement(tagName)
+        _container.appendChild(child)
+        val b = HtmlElementBuilder(child).also { it.init(); it.append() }
         return child as HTMLElement
     }
 
     private fun customElement(tagName: String, init: HtmlElementBuilder.() -> Unit = {}, customBuild: HtmlElementBuilder.() -> Unit = {}): Element {
-        val child = element.ownerDocument!!.createElement(tagName)
-        element.appendChild(child)
+        val child = _container.ownerDocument!!.createElement(tagName)
+        _container.appendChild(child)
         val b = HtmlElementBuilder(child)
         b.customBuild()
         b.init()
+        b.append()
         return child
     }
 
@@ -131,13 +164,13 @@ class HtmlElementBuilder(val element: Element) {
     fun select(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("select", init)
     fun span(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("span", init)
     fun table(init: TableElementBuilder.() -> Unit = {}): HTMLTableElement {
-        val table = element.appendElement("table") {} as HTMLTableElement
+        val table = _container.appendElement("table") {} as HTMLTableElement
         TableElementBuilder(table).init()
         return table
     }
 
     fun tabview(init: TabViewBuilder.() -> Unit = {}): TabView {
-        val tv = element.appendElement("tabview") {} as HTMLElement
+        val tv = _container.appendElement("tabview") {} as HTMLElement
         TabViewBuilder(tv).init()
         return TabView(tv)
     }
@@ -153,8 +186,8 @@ class HtmlElementBuilder(val element: Element) {
     fun ul(init: HtmlElementBuilder.() -> Unit = {}) = htmlElement("ul", init)
 
     fun svg(init: SvgElementBuilder.() -> Unit = {}): SVGElement {
-        val child = element.ownerDocument!!.createElementNS("http://www.w3.org/2000/svg", "svg") as SVGElement
-        element.appendChild(child)
+        val child = _container.ownerDocument!!.createElementNS("http://www.w3.org/2000/svg", "svg") as SVGElement
+        _container.appendChild(child)
         SvgElementBuilder(child).init()
         return child
     }
@@ -166,7 +199,7 @@ class TableElementBuilder(
 ) {
     fun caption(init: HtmlElementBuilder.() -> Unit = {}) {
         val cap = table.createCaption()
-        HtmlElementBuilder(cap).init()
+        HtmlElementBuilder(cap).also { it.init(); it.append() }
     }
 
     fun thead(init: TableSectionElementBuilder.() -> Unit) {
@@ -202,30 +235,30 @@ class TableRowElementBuilder(
 ) {
     fun header_cell(init: HtmlElementBuilder.() -> Unit = {}): HTMLTableCellElement {
         return trow.appendElement("th") {
-            HtmlElementBuilder(this as HTMLTableCellElement).init()
+            HtmlElementBuilder(this as HTMLTableCellElement).also { it.init(); it.append() }
         } as HTMLTableCellElement
     }
 
     fun data_cell(init: HtmlElementBuilder.() -> Unit = {}): HTMLTableCellElement {
         return trow.appendElement("td") {
-            HtmlElementBuilder(this as HTMLTableCellElement).init()
+            HtmlElementBuilder(this as HTMLTableCellElement).also { it.init(); it.append() }
         } as HTMLTableCellElement
     }
 }
 
 @HtmlDslMarker
 class AttributeBuilder(
-    val element: Element
+    private val _element: Element
 ) {
     fun get(attributeName: String): String? {
-        return this.element.getAttribute(attributeName)
+        return this._element.getAttribute(attributeName)
     }
 
     fun set(attributeName: String, value: String?) {
         if (value == null) {
-            this.element.removeAttribute(attributeName)
+            this._element.removeAttribute(attributeName)
         } else {
-            this.element.setAttribute(attributeName, value)
+            this._element.setAttribute(attributeName, value)
         }
     }
 
@@ -244,10 +277,10 @@ class AttributeBuilder(
 
 @HtmlDslMarker
 class EventHandlerBuilder(
-    val element: Element
+    private val _element: Element
 ) {
     fun event(eventName: String, handler: (Event) -> Unit) {
-        this.element.addEventListener(eventName, handler)
+        this._element.addEventListener(eventName, handler)
     }
 
     fun blur(handler: (Event) -> Unit) = event("blur", handler)
@@ -261,22 +294,22 @@ class EventHandlerBuilder(
 
 @HtmlDslMarker
 class ClassBuilder(
-    val element: Element
+    private val _element: Element
 ) {
     fun get(): List<String>? {
-        return this.element.getAttribute("class")?.split(" ")
+        return this._element.getAttribute("class")?.split(" ")
     }
 
     fun add(value: String) {
         val list = get()
         when {
-            list == null -> this.element.setAttribute("class", value)
+            list == null -> this._element.setAttribute("class", value)
             list.contains(value) -> { /* do nothing */
             }
 
             else -> {
                 val newValue = (list + value).joinToString(" ")
-                this.element.setAttribute("class", newValue)
+                this._element.setAttribute("class", newValue)
             }
         }
     }
@@ -292,7 +325,7 @@ class ClassBuilder(
 
             else -> {
                 val newValue = (list - value).joinToString(" ")
-                this.element.setAttribute("class", newValue)
+                this._element.setAttribute("class", newValue)
             }
         }
     }
@@ -427,7 +460,7 @@ class TabViewBuilder(
     fun tab(id: String, init: HtmlElementBuilder.() -> Unit) {
         tabView.appendElement("tab") {
             this.id = id
-            HtmlElementBuilder(this).init()
+            HtmlElementBuilder(this).also { it.init(); it.append() }
         }
     }
 }
