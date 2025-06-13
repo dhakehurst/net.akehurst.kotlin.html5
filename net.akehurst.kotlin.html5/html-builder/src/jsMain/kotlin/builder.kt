@@ -97,7 +97,7 @@ class HtmlElementBuilder(
             val ch = _container.removeChild(it) as Element
             val fc = _element.firstChild
             _element.appendChild(ch)
-            fc?.let { _element.insertBefore(fc, ch) }
+            fc?.let { _element.insertBefore(ch,fc) }
         }
     }
 

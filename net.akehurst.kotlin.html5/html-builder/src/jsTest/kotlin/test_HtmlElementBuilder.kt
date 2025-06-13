@@ -26,7 +26,7 @@ class test_HtmlElementBuilder {
     fun table() {
         document.body {
             table {
-                caption("")
+                caption{ }
                 thead {
                     row {
                         header_cell { content=""; attribute.style="" }

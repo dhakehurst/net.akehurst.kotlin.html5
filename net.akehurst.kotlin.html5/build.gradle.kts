@@ -55,6 +55,7 @@ subprojects {
             }
         }
         mavenCentral()
+        gradlePluginPortal()
     }
 
     configure<BuildConfigExtension> {
@@ -123,7 +124,33 @@ subprojects {
         sign(publishing.publications)
     }
 
-    rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
-        rootProject.the<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension>().version = "1.22.19"
+    val creds = project.properties["credentials"] as nu.studer.gradle.credentials.domain.CredentialsContainer
+    val sonatype_pwd = creds.forKey("SONATYPE_PASSWORD")
+        ?: getProjectProperty("SONATYPE_PASSWORD")
+        ?: error("Must set project property with Sonatype Password (-P SONATYPE_PASSWORD=<...> or set in ~/.gradle/gradle.properties)")
+    project.ext.set("signing.password", sonatype_pwd)
+
+    configure<PublishingExtension> {
+        repositories {
+            maven {
+                name = "sonatype"
+                setUrl("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+                credentials {
+                    username = getProjectProperty("SONATYPE_USERNAME")
+                        ?: error("Must set project property with Sonatype Username (-P SONATYPE_USERNAME=<...> or set in ~/.gradle/gradle.properties)")
+                    password = sonatype_pwd
+                }
+            }
+            maven {
+                name = "Other"
+                setUrl(getProjectProperty("PUB_URL")?: "<use -P PUB_URL=<...> to set>")
+                credentials {
+                    username = getProjectProperty("PUB_USERNAME")
+                        ?: error("Must set project property with Username (-P PUB_USERNAME=<...> or set in ~/.gradle/gradle.properties)")
+                    password = getProjectProperty("PUB_PASSWORD")?: creds.forKey(getProjectProperty("PUB_USERNAME"))
+                }
+            }
+        }
     }
+
 }
