@@ -113,12 +113,20 @@ subprojects {
         }
     }
 
+    val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
+        //dependsOn(dokkaHtml)
+        archiveClassifier.set("javadoc")
+        //from(dokkaHtml.outputDirectory)
+    }
+    tasks.named("publish").get().dependsOn("javadocJar")
+
     dependencies {
         "commonTestImplementation"(kotlin("test"))
         "commonTestImplementation"(kotlin("test-annotations-common"))
     }
 
     configure<SigningExtension> {
+        setRequired( {  gradle.taskGraph.hasTask("uploadArchives") })
         useGpgCmd()
         val publishing = project.properties["publishing"] as PublishingExtension
         sign(publishing.publications)
@@ -151,6 +159,46 @@ subprojects {
                 }
             }
         }
+        publications.withType<MavenPublication> {
+            artifact(javadocJar.get())
+
+            pom {
+                name.set("HTML4")
+                description.set("Builder for html 5")
+                url.set("https://github.com/dhakehurst/net.akehurst.kotlin.html5")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        name.set("Dr. David H. Akehurst")
+                        email.set("dr.david.h@akehurst.net")
+                    }
+                }
+                scm {
+                    url.set("https://github.com/dhakehurst/net.akehurst.kotlin.html5")
+                }
+            }
+        }
     }
 
+    val signTasks = arrayOf(
+        "signKotlinMultiplatformPublication",
+        "signJvm8Publication",
+        "signJsPublication",
+//        "signWasmJsPublication",
+//         "signMacosArm64Publication"
+    )
+    tasks.forEach {
+        when {
+            it.name.matches(Regex("publish(.)+")) -> {
+                println("${it.name}.mustRunAfter(${signTasks.toList()})")
+                it.mustRunAfter(*signTasks)
+            }
+        }
+    }
 }
