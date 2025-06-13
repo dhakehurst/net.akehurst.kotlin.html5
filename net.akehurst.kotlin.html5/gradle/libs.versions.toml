@@ -1,5 +1,5 @@
 [versions]
-project = "2.1.21"
+project = "2.2.0-SNAPSHOT"
 
 kotlin = "2.1.21"
 dokka = "2.0.0"
