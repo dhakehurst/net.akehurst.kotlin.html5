@@ -21,8 +21,9 @@ plugins {
     alias(libs.plugins.kotlin) apply false
     alias(libs.plugins.dokka) apply false
     alias(libs.plugins.buildconfig) apply false
-    alias(libs.plugins.exportPublic) apply false
 }
+project.layout.buildDirectory = File(rootProject.projectDir, ".gradle-build/${project.name}")
+/*
 val kotlin_languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2
 val kotlin_apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_2
 val jvmTargetVersion = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
@@ -45,14 +46,13 @@ subprojects {
     apply(plugin = "signing")
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "com.github.gmazzo.buildconfig")
-    apply(plugin = "net.akehurst.kotlin.gradle.plugin.exportPublic")
 
     repositories {
-        mavenLocal {
-            content{
-                includeGroupByRegex("net\\.akehurst.+")
-            }
-        }
+//        mavenLocal {
+//            content{
+//                includeGroupByRegex("net\\.akehurst.+")
+//            }
+//        }
         mavenCentral()
         gradlePluginPortal()
     }
@@ -199,3 +199,5 @@ subprojects {
         }
     }
 }
+
+ */

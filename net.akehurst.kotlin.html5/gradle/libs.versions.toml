@@ -1,10 +1,10 @@
 [versions]
-project = "2.2.20-SNAPSHOT"
+project = "2.2.21-SNAPSHOT"
 
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 dokka = "2.1.0"
-buildconfig = "5.7.0"
-exportPublic = "2.2.20-SNAPSHOT"
+buildconfig = "6.0.7"
+vanniktech = "0.35.0"
 
 kotlinx-coroutines = "1.10.2"
 
@@ -14,5 +14,5 @@ kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core",
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
-exportPublic =  { id = "net.akehurst.kotlin.gradle.plugin.exportPublic", version.ref = "exportPublic" }
 buildconfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildconfig" }
+vanniktech-maven-publish = { id="com.vanniktech.maven.publish", version.ref="vanniktech" }

@@ -25,7 +25,6 @@ plugins {
     alias(libs.plugins.kotlin)
     alias(libs.plugins.dokka)
     alias(libs.plugins.buildconfig)
-    alias(libs.plugins.exportPublic)
     signing
     alias(libs.plugins.vanniktech.maven.publish)
 }
@@ -163,9 +162,9 @@ mavenPublishing {
 
     coordinates(group as String, project.name, version as String)
     pom {
-        name.set("kotlin-hjson")
-        description.set("Multiplatform implementation of HJSON [https://hjson.github.io/, https://github.com/hjson] ")
-        url.set("https://github.com/dhakehurst/net.akehurst.kotlin.hjson")
+        name.set("HTML4")
+        description.set("Builder for html 5")
+        url.set("https://github.com/dhakehurst/net.akehurst.kotlin.html5")
 
         licenses {
             license {
@@ -180,7 +179,7 @@ mavenPublishing {
             }
         }
         scm {
-            url.set("https://github.com/dhakehurst/net.akehurst.kotlin.hjson")
+            url.set("https://github.com/dhakehurst/net.akehurst.kotlin.html5")
         }
     }
 }
